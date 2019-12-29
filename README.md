@@ -1,4 +1,4 @@
-# Data-lake-with-Spark
+# Data-Cloud-Warehouse-with-AWS-Redshift
 This repository contains the code of a ETL Pipeline that loads data from S3 buckets to staging tables on AWS Redshift and executes SQL statements that create the analytics tables from these staging tables.
 
 ## Project Description
