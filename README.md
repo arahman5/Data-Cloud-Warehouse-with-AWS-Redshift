@@ -1,4 +1,4 @@
-# Data-lake-with-Spark
+# Data-Cloud-Warehouse-with-AWS-Redshift
 This repository contains the code of a ETL Pipeline that loads data from S3 buckets to staging tables on AWS Redshift and executes SQL statements that create the analytics tables from these staging tables.
 
 ## Project Description
@@ -29,7 +29,7 @@ The reason that I chose a relational database management system for this project
 
 ## Entity Relationship Diagram (ERD)
 
-![Image](https://github.com/arahman5/Data-lake-with-Spark/blob/master/resource/ERD.PNG)
+![Image](https://github.com/arahman5/Data-Cloud-Warehouse-with-AWS-Redshift/blob/master/resource/ERD.PNG)
 
 The above represents the entity relationship diagram which shows how the different keys within the JSON logs can be connected together in a star schema. **songplays** is the fact table showing foreign keys that connect this table to all the other dimension tables. **users, time, songs, artists** are all dimension tables, each containing a primary key unique to each table. A star schema was chosen for this database design because of the following reasons:
 
@@ -48,7 +48,7 @@ Please see list of key steps that happens in the ETL Pipeline below:
 
 ### Udacity Workspace
 
-Firstly, fill in the `dwh.cfg` file with your AWS IAM Role information and your Cluster information. Execute the below command in the terminals in order:
+Firstly, download the contents of this repo in your Udacity workspace and then fill in the `dwh.cfg` file with your AWS IAM Role information and your Cluster information. After that, execute the below command in the terminals in order:
 
 ```python
 python create_tables.py
