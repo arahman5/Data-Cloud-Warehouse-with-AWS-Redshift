@@ -71,11 +71,11 @@ songplay_table_create = ("""
 CREATE TABLE IF NOT EXISTS songplays
 (
 songplay_id          INTEGER IDENTITY(0,1) PRIMARY KEY,
-start_time           TIMESTAMP,
-user_id              INTEGER,
+start_time           TIMESTAMP NOT NULL,
+user_id              INTEGER NOT NULL,
 level                VARCHAR,
-song_id              VARCHAR,
-artist_id            VARCHAR,
+song_id              VARCHAR NOT NULL,
+artist_id            VARCHAR NOT NULL,
 session_id           INTEGER,
 location             VARCHAR,
 user_agent           VARCHAR
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS songs
 (
 song_id     VARCHAR PRIMARY KEY,
 title       VARCHAR,
-artist_id   VARCHAR,
+artist_id   VARCHAR NOT NULL,
 year        INTEGER,
 duration    FLOAT
 );
@@ -173,7 +173,8 @@ SELECT DISTINCT to_timestamp(to_char(ts, '9999-99-99 99:99:99'),'YYYY-MM-DD HH24
                 location as location,
                 userAgent as user_agent
 FROM staging_events 
-JOIN staging_songs ON song = title AND artist = artist_name;
+JOIN staging_songs ON song = title AND artist = artist_name
+AND page  ==  'NextSong';
 """)
 
 user_table_insert = ("""
@@ -184,7 +185,8 @@ SELECT DISTINCT userId as user_id,
                 gender as gender,
                 level as level
 FROM staging_events
-where userId IS NOT NULL;
+WHERE userId IS NOT NULL
+AND page  ==  'NextSong';
 """)
 
 song_table_insert = ("""
@@ -206,20 +208,20 @@ SELECT DISTINCT artist_id as artist_id,
                 artist_latitude as latitude,
                 artist_longitude as longitude
 FROM staging_songs
-where artist_id IS NOT NULL;
+WHERE artist_id IS NOT NULL;
 """)
 
 time_table_insert = ("""
 INSERT INTO time(start_time, hour, day, week, month, year, weekday)
-SELECT distinct ts,
-                EXTRACT(hour from ts),
-                EXTRACT(day from ts),
-                EXTRACT(week from ts),
-                EXTRACT(month from ts),
-                EXTRACT(year from ts),
-                EXTRACT(weekday from ts)
-FROM staging_events
-WHERE ts IS NOT NULL;
+SELECT DISTINCT start_time,
+                EXTRACT(hour from start_time),
+                EXTRACT(day from start_time),
+                EXTRACT(week from start_time),
+                EXTRACT(month from start_time),
+                EXTRACT(year from start_time),
+                EXTRACT(weekday from start_time)
+FROM songplays
+WHERE start_time IS NOT NULL;
 """)
 
 # QUERY LISTS
