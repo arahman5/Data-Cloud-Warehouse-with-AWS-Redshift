@@ -157,7 +157,7 @@ staging_songs_copy = ("""
     COMPUPDATE OFF region 'us-west-2'
     FORMAT AS JSON 'auto' 
     TRUNCATECOLUMNS BLANKSASNULL EMPTYASNULL;
-""").format(SONG_DATA, KEY, SECRET, IAM_ROLE)
+""").format(SONG_DATA, KEY, SECRET)
 
 # FINAL TABLES
 
