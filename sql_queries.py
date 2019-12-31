@@ -10,6 +10,8 @@ LOG_DATA = config.get("S3","LOG_DATA")
 LOG_PATH = config.get("S3", "LOG_JSONPATH")
 SONG_DATA = config.get("S3", "SONG_DATA")
 IAM_ROLE = config.get("IAM_ROLE","ARN")
+KEY = config.get("AWS","KEY")
+SECRET = config.get("AWS","SECRET")
 
 # DROP TABLES
 
@@ -42,7 +44,7 @@ registration    BIGINT,
 sessionId       INTEGER,
 song            VARCHAR,
 status          INTEGER,
-ts              TIMESTAMP,
+ts              BIGINT,
 userAgent       VARCHAR,
 userId          INTEGER
 );
@@ -138,22 +140,24 @@ weekday       INTEGER
 
 staging_events_copy = ("""
     COPY staging_events FROM {}
-    CREDENTIALS 'aws_iam_role={}'
+    ACCESS_KEY_ID '{}'
+    SECRET_ACCESS_KEY '{}'
     COMPUPDATE OFF region 'us-west-2'
     TIMEFORMAT as 'epochmillisecs'
     TRUNCATECOLUMNS BLANKSASNULL EMPTYASNULL
     FORMAT AS JSON {};
-""").format(LOG_DATA, IAM_ROLE, LOG_PATH)
+""").format(LOG_DATA, KEY, SECRET, LOG_PATH)
 
 ## Extract out the song metadata from S3 and load them into staging table in Redshift
 
 staging_songs_copy = ("""
     COPY staging_songs FROM {}
-    CREDENTIALS 'aws_iam_role={}'
+    ACCESS_KEY_ID '{}'
+    SECRET_ACCESS_KEY '{}'
     COMPUPDATE OFF region 'us-west-2'
     FORMAT AS JSON 'auto' 
     TRUNCATECOLUMNS BLANKSASNULL EMPTYASNULL;
-""").format(SONG_DATA, IAM_ROLE)
+""").format(SONG_DATA, KEY, SECRET, IAM_ROLE)
 
 # FINAL TABLES
 
@@ -164,7 +168,7 @@ staging_songs_copy = ("""
 """
 songplay_table_insert = ("""
 INSERT INTO songplays(start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-SELECT DISTINCT to_timestamp(to_char(ts, '9999-99-99 99:99:99'),'YYYY-MM-DD HH24:MI:SS'),
+SELECT 		TIMESTAMP 'epoch' + ts/1000 * interval '1 second' as start_time,
                 userId as user_id,
                 level as level,
                 staging_songs.song_id as song_id,
@@ -174,7 +178,7 @@ SELECT DISTINCT to_timestamp(to_char(ts, '9999-99-99 99:99:99'),'YYYY-MM-DD HH24
                 userAgent as user_agent
 FROM staging_events 
 JOIN staging_songs ON song = title AND artist = artist_name
-AND page  ==  'NextSong';
+WHERE page = 'NextPage';
 """)
 
 user_table_insert = ("""
@@ -186,7 +190,7 @@ SELECT DISTINCT userId as user_id,
                 level as level
 FROM staging_events
 WHERE userId IS NOT NULL
-AND page  ==  'NextSong';
+AND page = 'NextPage';
 """)
 
 song_table_insert = ("""
