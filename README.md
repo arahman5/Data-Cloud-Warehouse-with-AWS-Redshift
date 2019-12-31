@@ -16,7 +16,7 @@ As a data engineer I built an ETL pipeline that extracts the JSON logs from S3 b
 * `etl.py` -reads and processes all JSON logs and loads the data into the tables.
 * `README.md` - Provides a summary of the project and discussions on the data modelling.
 * `Resource` - Folder containing images that were used in the README.
-
+*  `connect_redshift.ipynb` - Notebook that deploys your redshift cluster in the AWS Cloud based on the config details provided in `dwh.cfg`. 
 ## Choice of Database
 
 The reason that I chose a relational database management system for this project are as follows:
@@ -57,4 +57,11 @@ python create_tables.py
 ```python
 python etl.py
 ```
+## Locally in Ubuntu (Only works if you have AWS Redshift and S3 Access)
 
+Ensure you have Ubuntu 16.04 or 18.04 installed and Python3.6 or greater.
+
+* Update the AWS Config files with your details. Upload the contents within the `Data` folder to your S3 bucket and enter the path information in the format `s3://redshift-data-testing/log-data`.
+* Clone the contents of this repository into your local directory and create a virtual Environment there.
+* Pip Install Jupyter Notebook and any other modules that are required in the code.
+* Open `connect_redshift.ipynb` in the browser and execute all the cells as per the comments in the Notebook.
